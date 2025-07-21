@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🔥 URL Shortener</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+
+<body>
+  <div class="container">
+    <h2>URL Shortener</h2>
+    <textarea id="url" placeholder="Paste your URL here"></textarea>
+    
+    <select id="service">
+      <option value="TinyURL.com">TinyURL.com</option>
+      <option value="Is.gd">Is.gd</option>
+      <option value="Da.gd">Da.gd</option>
+      <option value="Clck.ru">Clck.ru</option>
+    </select>
+
+    <button onclick="shortenUrl()">Generate</button>
+
+    <textarea id="shortened" readonly placeholder="Shortened URL appears here"></textarea>
+    <button onclick="copyUrl()">Copy</button>
+  </div>
+
+  <script>
+    async function shortenUrl() {
+      const url = document.getElementById('url').value;
+      const service = document.getElementById('service').value;
+
+      const response = await fetch('/shorten', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ url, service })
+      });
+
+      const data = await response.json();
+      if (data.short_url) {
+        document.getElementById('shortened').value = data.short_url;
+      } else {
+        alert(data.error || 'An error occurred');
+      }
+    }
+
+    function copyUrl() {
+      const shortUrl = document.getElementById('shortened');
+      if (shortUrl.value) {
+        shortUrl.select();
+        navigator.clipboard.writeText(shortUrl.value);
+        alert('Shortened URL copied!');
+      } else {
+        alert('Nothing to copy!');
+      }
+    }
+  </script>
+</body>
+</html>
